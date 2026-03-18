@@ -32,7 +32,7 @@ export const serviceRecords = sqliteTable('service_records', {
   carId: text('car_id').notNull().references(() => cars.id, { onDelete: 'cascade' }),
   date: text('date').notNull(),
   mileage: integer('mileage'),
-  type: text('type').notNull(), // 'service', 'syn', 'olieskift', 'dæk', 'reparation', 'andet'
+  type: text('type').notNull(),
   description: text('description'),
   cost: real('cost').default(0),
   provider: text('provider'),

@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   ],
 
   hub: {
-    database: true,
+    db: 'sqlite',
   },
 
   app: {
@@ -20,12 +20,6 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'Personlig bil-vedligeholdelseslog' },
       ],
-    },
-  },
-
-  runtimeConfig: {
-    session: {
-      maxAge: 60 * 60 * 24 * 7, // 7 dage
     },
   },
 

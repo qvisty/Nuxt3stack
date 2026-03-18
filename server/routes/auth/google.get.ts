@@ -1,6 +1,8 @@
+import { eq } from 'drizzle-orm'
+
 const ALLOWED_EMAILS = ['qvisty@gmail.com', 'rikke.auning@gmail.com']
 
-export default oauthGoogleEventHandler({
+export default defineOAuthGoogleEventHandler({
   config: {
     scope: ['email', 'profile'],
   },
@@ -9,36 +11,23 @@ export default oauthGoogleEventHandler({
       return sendRedirect(event, '/?error=unauthorized')
     }
 
-    const db = useDrizzle()
-
-    let dbUser = await db
-      .select()
-      .from(tables.users)
-      .where(eq(tables.users.googleId, user.sub))
-      .get()
+    let dbUser = await db.select().from(schema.users).where(eq(schema.users.googleId, user.sub)).get()
 
     if (!dbUser) {
       const id = crypto.randomUUID()
-      await db.insert(tables.users).values({
+      await db.insert(schema.users).values({
         id,
         email: user.email,
         name: user.name || user.email,
         avatar: user.picture ?? null,
         googleId: user.sub,
       })
-      dbUser = await db
-        .select()
-        .from(tables.users)
-        .where(eq(tables.users.id, id))
-        .get()
+      dbUser = await db.select().from(schema.users).where(eq(schema.users.id, id)).get()
     } else {
       await db
-        .update(tables.users)
-        .set({
-          name: user.name || dbUser.name,
-          avatar: user.picture || dbUser.avatar,
-        })
-        .where(eq(tables.users.id, dbUser.id))
+        .update(schema.users)
+        .set({ name: user.name || dbUser.name, avatar: user.picture || dbUser.avatar })
+        .where(eq(schema.users.id, dbUser.id))
     }
 
     await setUserSession(event, {

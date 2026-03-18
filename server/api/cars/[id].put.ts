@@ -1,28 +1,22 @@
+import { eq, and } from 'drizzle-orm'
+
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
   const carId = getRouterParam(event, 'id')!
   const body = await readBody(event)
-  const db = useDrizzle()
 
   const car = await db
     .select()
-    .from(tables.cars)
-    .where(and(eq(tables.cars.id, carId), eq(tables.cars.userId, session.user.id)))
+    .from(schema.cars)
+    .where(and(eq(schema.cars.id, carId), eq(schema.cars.userId, session.user.id)))
     .get()
 
-  if (!car) {
-    throw createError({ statusCode: 404, message: 'Bil ikke fundet' })
-  }
-
-  if (!body.name?.trim()) {
-    throw createError({ statusCode: 400, message: 'Bilnavn er påkrævet' })
-  }
-  if (!body.licensePlate?.trim()) {
-    throw createError({ statusCode: 400, message: 'Nummerplade er påkrævet' })
-  }
+  if (!car) throw createError({ statusCode: 404, message: 'Bil ikke fundet' })
+  if (!body.name?.trim()) throw createError({ statusCode: 400, message: 'Bilnavn er påkrævet' })
+  if (!body.licensePlate?.trim()) throw createError({ statusCode: 400, message: 'Nummerplade er påkrævet' })
 
   await db
-    .update(tables.cars)
+    .update(schema.cars)
     .set({
       name: body.name.trim(),
       licensePlate: body.licensePlate.trim().toUpperCase(),
@@ -36,11 +30,7 @@ export default defineEventHandler(async (event) => {
       notes: body.notes?.trim() || null,
       updatedAt: Math.floor(Date.now() / 1000),
     })
-    .where(eq(tables.cars.id, carId))
+    .where(eq(schema.cars.id, carId))
 
-  return await db
-    .select()
-    .from(tables.cars)
-    .where(eq(tables.cars.id, carId))
-    .get()
+  return db.select().from(schema.cars).where(eq(schema.cars.id, carId)).get()
 })

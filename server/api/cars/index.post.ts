@@ -1,18 +1,15 @@
+import { eq } from 'drizzle-orm'
+
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
   const body = await readBody(event)
 
-  if (!body.name?.trim()) {
-    throw createError({ statusCode: 400, message: 'Bilnavn er påkrævet' })
-  }
-  if (!body.licensePlate?.trim()) {
-    throw createError({ statusCode: 400, message: 'Nummerplade er påkrævet' })
-  }
+  if (!body.name?.trim()) throw createError({ statusCode: 400, message: 'Bilnavn er påkrævet' })
+  if (!body.licensePlate?.trim()) throw createError({ statusCode: 400, message: 'Nummerplade er påkrævet' })
 
-  const db = useDrizzle()
   const id = crypto.randomUUID()
 
-  await db.insert(tables.cars).values({
+  await db.insert(schema.cars).values({
     id,
     userId: session.user.id,
     name: body.name.trim(),
@@ -27,11 +24,5 @@ export default defineEventHandler(async (event) => {
     notes: body.notes?.trim() || null,
   })
 
-  const car = await db
-    .select()
-    .from(tables.cars)
-    .where(eq(tables.cars.id, id))
-    .get()
-
-  return car
+  return db.select().from(schema.cars).where(eq(schema.cars.id, id)).get()
 })

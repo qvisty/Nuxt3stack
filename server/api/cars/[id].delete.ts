@@ -1,19 +1,18 @@
+import { eq, and } from 'drizzle-orm'
+
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
   const carId = getRouterParam(event, 'id')!
-  const db = useDrizzle()
 
   const car = await db
     .select()
-    .from(tables.cars)
-    .where(and(eq(tables.cars.id, carId), eq(tables.cars.userId, session.user.id)))
+    .from(schema.cars)
+    .where(and(eq(schema.cars.id, carId), eq(schema.cars.userId, session.user.id)))
     .get()
 
-  if (!car) {
-    throw createError({ statusCode: 404, message: 'Bil ikke fundet' })
-  }
+  if (!car) throw createError({ statusCode: 404, message: 'Bil ikke fundet' })
 
-  await db.delete(tables.cars).where(eq(tables.cars.id, carId))
+  await db.delete(schema.cars).where(eq(schema.cars.id, carId))
 
   return { success: true }
 })
