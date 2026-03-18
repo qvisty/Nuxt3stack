@@ -3,6 +3,7 @@ definePageMeta({ middleware: 'auth' })
 
 const route = useRoute()
 const oauthError = computed(() => route.query.error === 'oauth')
+const unauthorizedError = computed(() => route.query.error === 'unauthorized')
 </script>
 
 <template>
@@ -26,7 +27,15 @@ const oauthError = computed(() => route.query.error === 'oauth')
           </p>
 
           <UAlert
-            v-if="oauthError"
+            v-if="unauthorizedError"
+            color="error"
+            variant="soft"
+            title="Adgang nægtet"
+            description="Din Google-konto har ikke adgang til denne app."
+            class="mb-4"
+          />
+          <UAlert
+            v-else-if="oauthError"
             color="error"
             variant="soft"
             title="Login mislykkedes"

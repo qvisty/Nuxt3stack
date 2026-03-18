@@ -1,8 +1,14 @@
+const ALLOWED_EMAILS = ['qvisty@gmail.com', 'rikke.auning@gmail.com']
+
 export default oauthGoogleEventHandler({
   config: {
     scope: ['email', 'profile'],
   },
   async onSuccess(event, { user }) {
+    if (!ALLOWED_EMAILS.includes(user.email)) {
+      return sendRedirect(event, '/?error=unauthorized')
+    }
+
     const db = useDrizzle()
 
     let dbUser = await db
