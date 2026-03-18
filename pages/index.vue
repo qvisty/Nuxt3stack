@@ -1,189 +1,64 @@
 <script setup lang="ts">
-/**
- * Forside — oversigt over alle Nuxt 3 + Loko.rs features.
- *
- * Demonstrerer:
- *  - useSeoMeta (SEO meta tags)
- *  - useRuntimeConfig (miljø-variabler)
- *  - Komponent-brug
- */
+definePageMeta({ middleware: 'auth' })
 
-useSeoMeta({
-  title: 'Nuxt 3 + Loko.rs Demo',
-  description:
-    'Selvdokumenterende Nuxt 3 demo der viser alle kernefunktioner mens den bruger Loko.rs som Rust backend.',
-  ogTitle: 'Nuxt 3 + Loko.rs Demo',
-  ogDescription: 'Live demonstration af Nuxt 3 med Rust/Loko.rs backend',
-})
-
-const config = useRuntimeConfig()
-
-const features = [
-  {
-    icon: '🗂️',
-    title: 'Fil-baseret Routing',
-    description:
-      'Filer i pages/ bliver automatisk til URL-ruter. Ingen router-konfiguration nødvendig.',
-    to: '/routing',
-    badge: 'nuxt' as const,
-    tag: 'pages/routing/index.vue → /routing',
-  },
-  {
-    icon: '🔀',
-    title: 'Dynamiske Ruter',
-    description:
-      '[id].vue skaber dynamiske parametre. useRoute() giver adgang til params og query.',
-    to: '/routing/42',
-    badge: 'nuxt' as const,
-    tag: 'pages/routing/[id].vue → /routing/:id',
-  },
-  {
-    icon: '📡',
-    title: 'Data Fetching',
-    description:
-      'useFetch og useAsyncData henter data fra Loko.rs API med SSR-support, caching og reaktivitet.',
-    to: '/data-fetching',
-    badge: 'nuxt' as const,
-    tag: 'useFetch("/api/posts") → Nitro → Loko.rs',
-  },
-  {
-    icon: '⚙️',
-    title: 'Server API Routes',
-    description:
-      'Nitro server routes i server/api/ proxyer til Loko.rs Rust backend. Type-sikre med TypeScript.',
-    to: '/server-api',
-    badge: 'nitro' as const,
-    tag: 'server/api/posts.get.ts → Loko.rs /api/posts',
-  },
-  {
-    icon: '🧩',
-    title: 'Composables',
-    description:
-      'useLokoApi er en custom composable der indkapsler al Loko.rs API-logik. Auto-importeret.',
-    to: '/composables',
-    badge: 'nuxt' as const,
-    tag: 'composables/useLokoApi.ts',
-  },
-  {
-    icon: '🗃️',
-    title: 'State Management',
-    description:
-      'Pinia store med tæller, favoritter og tema. Reaktiv state der deles på tværs af komponenter.',
-    to: '/state',
-    badge: 'pinia' as const,
-    tag: 'stores/demo.ts',
-  },
-  {
-    icon: '💧',
-    title: 'SSR & Hydration',
-    description:
-      'useAsyncData henter data server-side. Hydration overfører state til browseren uden ekstra fetch.',
-    to: '/ssr',
-    badge: 'nuxt' as const,
-    tag: 'useAsyncData → Server render → Hydration',
-  },
-  {
-    icon: '🔐',
-    title: 'Middleware',
-    description:
-      'Global og named middleware. tracking.global.ts kører på alle sider, auth.ts på valgte.',
-    to: '/middleware',
-    badge: 'nuxt' as const,
-    tag: 'middleware/auth.ts + tracking.global.ts',
-  },
-]
-
-const store = useDemoStore()
+const route = useRoute()
+const oauthError = computed(() => route.query.error === 'oauth')
 </script>
 
 <template>
-  <div class="max-w-5xl">
-    <!-- Hero -->
-    <div class="mb-10">
-      <div class="flex items-center gap-2 mb-3">
-        <span class="badge-nuxt text-sm px-3 py-1">Nuxt 3.10</span>
-        <span class="badge-loko text-sm px-3 py-1">Loko.rs 0.5</span>
-        <span class="badge-nitro text-sm px-3 py-1">Nitro</span>
-        <span
-          class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-        >Pinia</span>
-      </div>
-
-      <h1 class="text-4xl font-bold mb-3">
-        <span class="gradient-nuxt">Nuxt 3</span>
-        <span class="text-slate-500 mx-2">×</span>
-        <span class="gradient-loko">Loko.rs</span>
-      </h1>
-
-      <p class="text-lg text-slate-300 max-w-2xl leading-relaxed">
-        En selvdokumenterende full-stack demo. Hver side <strong class="text-slate-100">viser</strong> en
-        Nuxt 3 feature i aktion og <strong class="text-slate-100">bruger</strong> den bagved. Backenden
-        er en <span class="text-loko-400">Loko.rs</span> Rust API proxyet via
-        <span class="text-blue-400">Nitro</span> server routes.
-      </p>
-    </div>
-
-    <!-- Loko status -->
-    <div class="mb-8">
-      <LokoStatus />
-    </div>
-
-    <!-- Architecture overview -->
-    <div class="mb-8 p-5 rounded-xl bg-dark-800 border border-dark-600">
-      <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">
-        Arkitektur
-      </h2>
-      <div class="font-mono text-sm text-slate-400 leading-loose">
-        <div class="flex flex-wrap gap-x-3 gap-y-1 items-center">
-          <span class="text-slate-200">Browser</span>
-          <span class="text-slate-600">→</span>
-          <span class="text-nuxt-400">Nuxt 3 (Vue 3 / SSR)</span>
-          <span class="text-slate-600">→</span>
-          <span class="text-blue-400">Nitro server/api/</span>
-          <span class="text-slate-600">→</span>
-          <span class="text-loko-400">Loko.rs (Rust/Axum)</span>
-          <span class="text-slate-600">→</span>
-          <span class="text-green-400">PostgreSQL</span>
+  <div class="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+      <!-- Logo / ikon -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary-500 mb-4 shadow-lg">
+          <UIcon name="i-heroicons-wrench-screwdriver" class="w-10 h-10 text-white" />
         </div>
-        <div class="mt-2 text-xs text-slate-600">
-          runtimeConfig.lokoApiUrl = "{{ config.public.lokoApiUrl }}"
+        <h1 class="text-3xl font-bold text-white">Bilvedligeholdelse</h1>
+        <p class="text-gray-400 mt-2">Hold styr på dine biler, service og økonomi</p>
+      </div>
+
+      <!-- Login kort -->
+      <UCard class="shadow-2xl">
+        <div class="p-2">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-1">Log ind</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+            Kun du har adgang til dine data
+          </p>
+
+          <UAlert
+            v-if="oauthError"
+            color="error"
+            variant="soft"
+            title="Login mislykkedes"
+            description="Der opstod en fejl med Google login. Prøv igen."
+            class="mb-4"
+          />
+
+          <a href="/auth/google" class="block w-full">
+            <UButton
+              block
+              size="lg"
+              color="neutral"
+              variant="outline"
+              class="gap-3"
+            >
+              <template #leading>
+                <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+              </template>
+              Fortsæt med Google
+            </UButton>
+          </a>
+
+          <p class="text-xs text-center text-gray-400 dark:text-gray-500 mt-4">
+            Dine data er private og kun tilgængelige for dig
+          </p>
         </div>
-      </div>
-    </div>
-
-    <!-- Features grid -->
-    <div>
-      <h2 class="section-title mb-4">Nuxt 3 Features</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <FeatureCard
-          v-for="feature in features"
-          :key="feature.to"
-          v-bind="feature"
-        />
-      </div>
-    </div>
-
-    <!-- Visited pages tracker (demonstrates global middleware) -->
-    <div class="mt-8 p-4 rounded-xl bg-dark-800 border border-dark-600">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-sm font-medium text-slate-300">
-          Besøgte sider
-          <span class="text-xs text-slate-500 ml-1">(tracking.global.ts middleware)</span>
-        </h3>
-        <span class="badge-nuxt">Middleware</span>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        <span
-          v-for="path in store.visitedPages"
-          :key="path"
-          class="text-xs font-mono px-2 py-1 rounded bg-dark-700 text-nuxt-400 border border-dark-600"
-        >
-          {{ path }}
-        </span>
-        <span v-if="!store.visitedPages.length" class="text-xs text-slate-600">
-          Ingen besøgte sider endnu
-        </span>
-      </div>
+      </UCard>
     </div>
   </div>
 </template>

@@ -1,9 +1,5 @@
 <template>
-  <NuxtLayout>
+  <UApp>
     <NuxtPage />
-  </NuxtLayout>
+  </UApp>
 </template>
-
-<style>
-@import '~/assets/css/main.css';
-</style>
