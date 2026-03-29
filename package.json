@@ -10,11 +10,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxthub/core": "latest",
+    "@libsql/client": "^0.17.2",
     "@nuxt/ui": "^3.0.0",
+    "drizzle-orm": "^0.38.0",
     "nuxt": "^3.15.0",
     "nuxt-auth-utils": "latest",
-    "drizzle-orm": "^0.38.0",
     "vue": "latest",
     "vue-router": "latest"
   },
