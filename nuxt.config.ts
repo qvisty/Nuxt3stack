@@ -3,13 +3,8 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/ui',
-    '@nuxthub/core',
     'nuxt-auth-utils',
   ],
-
-  hub: {
-    db: 'sqlite',
-  },
 
   app: {
     head: {
