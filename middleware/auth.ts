@@ -1,26 +1,11 @@
-/**
- * Named route middleware: 'auth'
- *
- * Bruges kun på sider der eksplicit aktiverer den:
- *   definePageMeta({ middleware: 'auth' })
- *
- * Demonstrerer:
- *  - Betinget redirect
- *  - useState til simpel auth-state
- *  - navigateTo() helper
- */
 export default defineNuxtRouteMiddleware((to) => {
-  // I en rigtig app: tjek JWT token fra cookie/localStorage
-  // Her simulerer vi med useState
-  const isAuthenticated = useState('auth:isAuthenticated', () => false)
+  const { loggedIn } = useUserSession()
 
-  // Sider der kræver login
-  const protectedPaths = ['/dashboard', '/admin']
+  if (!loggedIn.value && to.path !== '/') {
+    return navigateTo('/')
+  }
 
-  if (protectedPaths.includes(to.path) && !isAuthenticated.value) {
-    return navigateTo({
-      path: '/middleware',
-      query: { redirect: to.path, reason: 'not-authenticated' },
-    })
+  if (loggedIn.value && to.path === '/') {
+    return navigateTo('/dashboard')
   }
 })
